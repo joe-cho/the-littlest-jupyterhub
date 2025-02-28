@@ -2,11 +2,11 @@ from setuptools import find_packages, setup
 
 setup(
     name="the-littlest-jupyterhub",
-    version="2.0.1.dev",
+    version="2.0.0",
     description="A small JupyterHub distribution",
-    url="https://github.com/jupyterhub/the-littlest-jupyterhub",
-    author="Jupyter Development Team",
-    author_email="jupyter@googlegroups.com",
+    url="https://github.com/joe-cho/the-littlest-jupyterhub",
+    author="Joe Cho",
+    author_email="joe.cho@narnia.ai",
     license="3 Clause BSD",
     packages=find_packages(),
     include_package_data=True,

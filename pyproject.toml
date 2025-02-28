@@ -62,10 +62,10 @@ omit = [
 # ref: https://github.com/your-tools/tbump#readme
 #
 [tool.tbump]
-github_url = "https://github.com/jupyterhub/the-littlest-jupyterhub"
+github_url = "https://github.com/joe-cho/the-littlest-jupyterhub"
 
 [tool.tbump.version]
-current = "2.0.1.dev"
+current = "2.0.0"
 regex = '''
     (?P<major>\d+)
     \.
