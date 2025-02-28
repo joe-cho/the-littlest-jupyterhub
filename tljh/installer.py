@@ -202,6 +202,15 @@ def ensure_user_environment(user_requirements_txt_file):
             installer_url, installer_sha256
         ) as installer_path:
             conda.install_miniconda(installer_path, USER_ENV_PREFIX)
+            
+        # Add this immediately after miniconda installation to set Python version to 3.10
+        conda.ensure_conda_packages(
+            USER_ENV_PREFIX,
+            ["python=3.10"],
+            channels=["conda-forge"],
+            force_reinstall=True
+        )
+        
         package_versions = conda.get_conda_package_versions(USER_ENV_PREFIX)
 
         # quick sanity check: we should have conda and mamba!
