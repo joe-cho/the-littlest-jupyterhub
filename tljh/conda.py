@@ -113,7 +113,7 @@ def ensure_conda_packages(
         # fallback on conda if mamba is not present (e.g. for mamba to install itself)
         conda_executable = os.path.join(prefix, "bin", "conda")
 
-    cmd = [conda_executable, "install", "--yes"]
+    cmd = [conda_executable, "install", "python=3.10", "--yes"]
 
     if force_reinstall:
         # use force-reinstall, e.g. for conda/mamba to ensure everything is okay
