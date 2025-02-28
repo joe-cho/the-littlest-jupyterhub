@@ -90,13 +90,16 @@ def fix_permissions(prefix):
 
 def install_miniconda(installer_path, prefix):
     """
-    Install miniconda with installer at installer_path under prefix
+    Install miniconda with installer at installer_path under prefix and set Python version to 3.10
     """
     utils.run_subprocess(["/bin/bash", installer_path, "-u", "-b", "-p", prefix])
     # fix permissions on initial install
     # a few files have the wrong ownership and permissions initially
     # when the installer is run as root
     fix_permissions(prefix)
+    
+    # Ensure Python 3.10 is installed
+    ensure_conda_packages(prefix, ["python=3.10"], channels=["conda-forge"])
 
 
 def ensure_conda_packages(
@@ -113,7 +116,7 @@ def ensure_conda_packages(
         # fallback on conda if mamba is not present (e.g. for mamba to install itself)
         conda_executable = os.path.join(prefix, "bin", "conda")
 
-    cmd = [conda_executable, "install", "python=3.10", "--yes"]
+    cmd = [conda_executable, "install", "--yes"]
 
     if force_reinstall:
         # use force-reinstall, e.g. for conda/mamba to ensure everything is okay
