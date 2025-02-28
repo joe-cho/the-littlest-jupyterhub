@@ -306,7 +306,7 @@ def _resolve_git_version(version):
             "ls-remote",
             "--tags",
             "--refs",
-            "https://github.com/jupyterhub/the-littlest-jupyterhub.git",
+            "https://github.com/joe-cho/the-littlest-jupyterhub.git",
         ]
     )
 
