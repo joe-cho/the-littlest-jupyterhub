@@ -29,7 +29,7 @@ ipywidgets>=8.1.5,<9
 pandas>=2.1.4,<3.0.0
 h5py>=3.11.0,<4.0.0
 pyyaml>=6.0.1,<7.0.0
-# "torch-geometric>=2.4.0,<3.0.0",
+torch-geometric>=2.4.0,<3.0.0
 lightning>=2.1.2,<3.0.0
 uncertainty-toolbox>=0.1.1,<0.2.0
 point-cloud-utils>=0.30.4,<0.31.0
@@ -59,8 +59,33 @@ trame-vtk>=2.8.11,<3.0.0
 panel>=1.5.3,<2.0.0
 trame==2.5.2
 plotly>=5.24.1,<6.0.0
-# "ema-pytorch>=0.7.7,<0.8.0",
+ema-pytorch>=0.7.7,<0.8.0
 occ>=0.0.2.dev20190912195130
 bokeh>=3.6.2,<4.0.0
 numpy==1.26.2
 meshio>=5.3.5,<6.0.0
+
+# PyTorch and related packages with platform-specific wheels
+torch @ https://download.pytorch.org/whl/cpu/torch-2.1.1-cp310-none-macosx_11_0_arm64.whl; platform_system == "Darwin"
+torch @ https://download.pytorch.org/whl/cu118/torch-2.1.1%2Bcu118-cp310-cp310-linux_x86_64.whl; platform_system == "Linux"
+
+torchvision @ https://download.pytorch.org/whl/cpu/torchvision-0.16.1-cp310-cp310-macosx_11_0_arm64.whl; platform_system == "Darwin"
+torchvision @ https://download.pytorch.org/whl/cu118/torchvision-0.16.1%2Bcu118-cp310-cp310-linux_x86_64.whl; platform_system == "Linux"
+
+pyg_lib @ https://data.pyg.org/whl/torch-2.1.0%2Bcpu/pyg_lib-0.3.1%2Bpt21-cp310-cp310-macosx_11_0_x86_64.whl; platform_system == "Darwin"
+pyg_lib @ https://data.pyg.org/whl/torch-2.1.0%2Bcu118/pyg_lib-0.3.1%2Bpt21cu118-cp310-cp310-linux_x86_64.whl; platform_system == "Linux"
+
+torch_scatter @ https://data.pyg.org/whl/torch-2.1.0%2Bcpu/torch_scatter-2.1.2-cp310-cp310-macosx_11_0_x86_64.whl; platform_system == "Darwin"
+torch_scatter @ https://data.pyg.org/whl/torch-2.1.0%2Bcu118/torch_scatter-2.1.2%2Bpt21cu118-cp310-cp310-linux_x86_64.whl; platform_system == "Linux"
+
+torch_sparse @ https://data.pyg.org/whl/torch-2.1.0%2Bcpu/torch_sparse-0.6.18-cp310-cp310-macosx_11_0_x86_64.whl; platform_system == "Darwin"
+torch_sparse @ https://data.pyg.org/whl/torch-2.1.0%2Bcu118/torch_sparse-0.6.18%2Bpt21cu118-cp310-cp310-linux_x86_64.whl; platform_system == "Linux"
+
+torch_cluster @ https://data.pyg.org/whl/torch-2.1.0%2Bcpu/torch_cluster-1.6.3-cp310-cp310-macosx_11_0_x86_64.whl; platform_system == "Darwin"
+torch_cluster @ https://data.pyg.org/whl/torch-2.1.0%2Bcu118/torch_cluster-1.6.3%2Bpt21cu118-cp310-cp310-linux_x86_64.whl; platform_system == "Linux"
+
+torch_spline_conv @ https://data.pyg.org/whl/torch-2.1.0%2Bcpu/torch_spline_conv-1.2.2-cp310-cp310-macosx_11_0_x86_64.whl; platform_system == "Darwin"
+torch_spline_conv @ https://data.pyg.org/whl/torch-2.1.0%2Bcu118/torch_spline_conv-1.2.2%2Bpt21cu118-cp310-cp310-linux_x86_64.whl; platform_system == "Linux"
+
+# Kaolin (Linux only)
+kaolin @ https://nvidia-kaolin.s3.us-east-2.amazonaws.com/torch-2.1.1_cu121/kaolin-0.15.0-cp310-cp310-linux_x86_64.whl; platform_system == "Linux"
