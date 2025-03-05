@@ -456,7 +456,12 @@ def main():
         )
         # Section "universe" exists and is required only in ubuntu.
         if distro == "ubuntu":
-            run_subprocess(["add-apt-repository", "universe", "--yes"])
+            run_subprocess([
+                "add-apt-repository",
+                "--yes",
+                "universe",
+                "ppa:freecad-maintainers/freecad-stable"
+            ])
         run_subprocess(["apt-get", "update"])
         run_subprocess(
             [
@@ -468,10 +473,83 @@ def main():
                 "python3-pip",
                 "git",
                 "sudo",  # sudo is missing in default debian install
+                "build-essential",
+                "ca-certificates",
+                "ccache",
+                "cmake",
+                "curl",
+                "git",
+                "pkg-config",
+                "ssh",
+                "unzip",
+                "wget",
+                "libfreetype6-dev",
+                "libhdf5-serial-dev",
+                "libzmq3-dev",
+                "libjpeg-dev",
+                "libpng-dev",
+                "libsm6",
+                "libxext6",
+                "libxrender-dev",
+                "libffi-dev",
+                "libsqlite3-dev",
+                "libbz2-dev",
+                "ffmpeg",
+                "python3-tk",
+                "liblzma-dev",
+                "ninja-build",
+                "libosmesa6-dev",
+                "libboost-all-dev",
+                "freecad",
+                "potrace",
+                "xvfb",
+                "cuda-toolkit-11-8",
+                "libncurses5-dev",
+                "libncursesw5-dev",
+                "libreadline-dev",
+                "libgl1-mesa-glx",
             ],
             env=apt_get_adjusted_env,
         )
 
+        # Install AWS CLI
+        logger.info("Installing AWS CLI...")
+        run_subprocess([
+            "curl",
+            "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip",
+            "-o", "awscliv2.zip"
+        ])
+        run_subprocess(["unzip", "awscliv2.zip"])
+        run_subprocess(["./aws/install"])
+
+        # Install DVC
+        logger.info("Installing DVC...")
+        run_subprocess([
+            "sudo wget",
+            "https://dvc.org/deb/dvc.list",
+            "-O", "/etc/apt/sources.list.d/dvc.list"
+        ])
+        run_subprocess([
+            "wget",
+            "-qO-",
+            "https://dvc.org/deb/iterative.asc",
+            "|",
+            "gpg",
+            "--dearmor",
+            ">",
+            "packages.iterative.gpg"
+        ])
+        run_subprocess([
+            "sudo install",
+            "-o", "root",
+            "-g", "root",
+            "-m", "644",
+            "packages.iterative.gpg",
+            "/etc/apt/trusted.gpg.d/packages.iterative.gpg"
+        ])
+        run_subprocess(["sudo apt-get", "update"])
+        run_subprocess(["sudo apt-get", "install", "dvc"])
+        
         logger.info("Setting up virtual environment at {}".format(hub_env_prefix))
         os.makedirs(hub_env_prefix, exist_ok=True)
         run_subprocess(["python3", "-m", "venv", hub_env_prefix])
