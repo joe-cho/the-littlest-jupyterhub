@@ -460,6 +460,10 @@ def main():
                 "add-apt-repository",
                 "--yes",
                 "universe",
+            ])
+            run_subprocess([
+                "add-apt-repository",
+                "--yes",
                 "ppa:freecad-maintainers/freecad-stable"
             ])
         run_subprocess(["apt-get", "update"])
@@ -514,41 +518,46 @@ def main():
 
         # Install AWS CLI
         logger.info("Installing AWS CLI...")
+        run_subprocess(["rm", "-rf", "awscliv2.zip", "aws"])  # Clean up any existing files
         run_subprocess([
             "curl",
             "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip",
             "-o", "awscliv2.zip"
         ])
         run_subprocess(["unzip", "awscliv2.zip"])
-        run_subprocess(["./aws/install"])
+        run_subprocess(["./aws/install", "--update"])
 
         # Install DVC
         logger.info("Installing DVC...")
         run_subprocess([
-            "sudo wget",
+            "wget",
             "https://dvc.org/deb/dvc.list",
             "-O", "/etc/apt/sources.list.d/dvc.list"
         ])
+        # Download and process the GPG key in separate steps
         run_subprocess([
             "wget",
-            "-qO-",
-            "https://dvc.org/deb/iterative.asc",
-            "|",
-            "gpg",
-            "--dearmor",
-            ">",
-            "packages.iterative.gpg"
+            "-qO",
+            "iterative.asc",
+            "https://dvc.org/deb/iterative.asc"
         ])
         run_subprocess([
-            "sudo install",
+            "gpg",
+            "--dearmor",
+            "-o",
+            "packages.iterative.gpg",
+            "iterative.asc"
+        ])
+        run_subprocess([
+            "install",
             "-o", "root",
             "-g", "root",
             "-m", "644",
             "packages.iterative.gpg",
             "/etc/apt/trusted.gpg.d/packages.iterative.gpg"
         ])
-        run_subprocess(["sudo apt-get", "update"])
-        run_subprocess(["sudo apt-get", "install", "dvc"])
+        run_subprocess(["apt-get", "update"], env=apt_get_adjusted_env)
+        run_subprocess(["apt-get", "install", "dvc"], env=apt_get_adjusted_env)
         
         logger.info("Setting up virtual environment at {}".format(hub_env_prefix))
         os.makedirs(hub_env_prefix, exist_ok=True)
