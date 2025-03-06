@@ -24,7 +24,7 @@ import subprocess
 import shutil
 
 def first_time_setup(spawner):
-    user_home = spawner.user.home
+    user_home = f"/home/jupyter-{spawner.user.name}"
     first_run_flag = os.path.join(user_home, ".first_run_done")
 
     if not os.path.exists(first_run_flag):
