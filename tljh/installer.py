@@ -503,26 +503,6 @@ def ensure_config_yaml(plugin_manager):
         yaml.dump(config, f)
 
 
-def ensure_jupyterhub_has_dhh_bpc_ai_config():
-    """
-    Ensure JupyterHub has the DHH BPC AI configuration file in place.
-    Copies dhh_bpc_ai_user_config.py to /opt/tljh/config/jupyterhub_config.d/
-    """
-    src = os.path.join(HERE, "dhh_bpc_ai_user_config.py")
-    dst = os.path.join(CONFIG_DIR, "jupyterhub_config.d", "dhh_bpc_ai_user_config.py")
-    
-    # Create the destination directory if it doesn't exist
-    os.makedirs(os.path.dirname(dst), mode=0o700, exist_ok=True)
-    
-    # Copy the configuration file
-    if os.path.exists(src):
-        import shutil
-        shutil.copy2(src, dst)
-        logger.info("Copied DHH BPC AI configuration file to %s", dst)
-    else:
-        logger.warning("DHH BPC AI configuration file not found at %s", src)
-
-
 def main():
     from .log import init_logging
 
@@ -567,7 +547,6 @@ def main():
         except Exception as e:
             logger.error(f"Couldn't stop the progress page server. Exception was {e}.")
 
-    ensure_jupyterhub_has_dhh_bpc_ai_config(CONFIG_DIR)
     ensure_jupyterhub_service(HUB_ENV_PREFIX)
     ensure_jupyterhub_running()
     ensure_symlinks(HUB_ENV_PREFIX)
