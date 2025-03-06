@@ -47,6 +47,8 @@ def setup_dhh_bpc_ai_user(system_username):
                 src_file = os.path.join(notebook_src, file)
                 dst_file = os.path.join(user_home, file)
                 shutil.copy2(src_file, dst_file)
+                # Change ownership of copied file to the system user
+                shutil.chown(dst_file, system_username, system_username)
             
         # Create flag file to prevent reruns
         open(first_run_flag, "w").close()
