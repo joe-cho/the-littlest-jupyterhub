@@ -22,6 +22,7 @@ def setup_dhh_bpc_ai_user(system_username):
     Args:
         username (str): The username of the JupyterHub user
     """
+    print(f"Setting up DHH BPC AI user environment for {system_username}")
     user_home = f"/home/{system_username}"
     first_run_flag = os.path.join(user_home, ".first_run_done")
 
@@ -49,6 +50,7 @@ def setup_dhh_bpc_ai_user(system_username):
             
         # Create flag file to prevent reruns
         open(first_run_flag, "w").close()
+        print(f"DHH BPC AI user environment setup complete for {system_username}")
 
 def ensure_user(username):
     """
