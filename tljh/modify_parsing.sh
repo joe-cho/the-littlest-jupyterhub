@@ -28,3 +28,8 @@ fi
 # Modify line 102 using sed (in-place edit)
 sed -i '102s/{k: local_vars\[k\] for k in init_parameters}/{k: local_vars[k] for k in init_parameters if k in local_vars}/' "$TARGET_FILE"
 echo "Modification complete: $TARGET_FILE"
+
+# Make all files in the aslanx_ai and dhh_bpc_ai directories
+# readable and writable by all users
+chmod -R o+rw /opt/tljh/user/lib/python3.10/site-packages/aslanx_ai
+chmod -R o+rw /opt/tljh/user/lib/python3.10/site-packages/dhh_bpc_ai
