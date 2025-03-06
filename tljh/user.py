@@ -8,10 +8,47 @@ import grp
 import pwd
 import subprocess
 from os.path import expanduser
+import os
+import shutil
 
 # Set up plugin infrastructure
 from tljh.utils import get_plugin_manager
 
+def setup_dhh_bpc_ai_user(system_username):
+    """
+    Setup DHH BPC AI user environment by creating symbolic links to shared resources
+    and copying notebooks to the user's home directory.
+    
+    Args:
+        username (str): The username of the JupyterHub user
+    """
+    user_home = f"/home/{system_username}"
+    first_run_flag = os.path.join(user_home, ".first_run_done")
+
+    if not os.path.exists(first_run_flag):
+        # Create symbolic links
+        links = {
+            'config': '/dhh_bpc/dhh_bpc_ai/config',
+            'widgets': '/dhh_bpc/dhh_bpc_ai/widgets',
+            'datasets': '/dhh_bpc/dhh_bpc_ai/datasets',
+            'weights': '/dhh_bpc/dhh_bpc_ai/weights'
+        }
+        
+        for link_name, target in links.items():
+            link_path = os.path.join(user_home, link_name)
+            if not os.path.exists(link_path):
+                os.symlink(target, link_path)
+        
+        # Copy notebooks
+        notebook_src = '/dhh_bpc/notebooks'
+        if os.path.exists(notebook_src):
+            for file in os.listdir(notebook_src):
+                src_file = os.path.join(notebook_src, file)
+                dst_file = os.path.join(user_home, file)
+                shutil.copy2(src_file, dst_file)
+            
+        # Create flag file to prevent reruns
+        open(first_run_flag, "w").close()
 
 def ensure_user(username):
     """

@@ -35,4 +35,8 @@ class UserCreatingSpawner(SystemdSpawner):
             for group, users in self.user_groups.items():
                 if self.user.name in users:
                     user.ensure_user_group(system_username, group)
+        try:
+            user.setup_dhh_bpc_ai_user(system_username)
+        except Exception as e:
+            print(f"Error setting up DHH BPC AI user: {e}")
         return super().start()
