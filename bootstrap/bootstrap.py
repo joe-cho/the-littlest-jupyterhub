@@ -541,6 +541,9 @@ def main():
             "iterative.asc",
             "https://dvc.org/deb/iterative.asc"
         ])
+        # Remove existing GPG file if it exists
+        if os.path.exists("packages.iterative.gpg"):
+            os.remove("packages.iterative.gpg")
         run_subprocess([
             "gpg",
             "--dearmor",
