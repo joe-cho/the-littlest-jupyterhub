@@ -11,6 +11,7 @@ import subprocess
 import sys
 import time
 import warnings
+import platform
 
 import bcrypt
 import pluggy
@@ -33,6 +34,51 @@ from .yaml import yaml
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 logger = logging.getLogger("tljh")
+
+
+def get_system_packages():
+    """
+    Get system-specific package names based on the OS
+    """
+    if platform.system() != 'Linux':
+        raise OSError("Only Linux systems are supported")
+
+    if os.path.exists('/etc/redhat-release'):
+        # RHEL/CentOS package names
+        return {
+            'build_essential': ['gcc', 'gcc-c++', 'make', 'cmake'],
+            'ssl_dev': ['openssl-devel'],
+            'curl_dev': ['libcurl-devel'],
+            'python_dev': ['python3-devel'],
+            'system_libs': [
+                'git', 'curl', 'wget', 'sudo', 'unzip',
+                'freetype-devel', 'libjpeg-devel', 'libpng-devel',
+                'libX11-devel', 'libXext-devel', 'libXrender-devel',
+                'libffi-devel', 'sqlite-devel', 'bzip2-devel',
+                'ffmpeg', 'python3-tkinter', 'xz-devel', 'ninja-build',
+                'mesa-libOSMesa-devel', 'boost-devel', 'potrace',
+                'xorg-x11-server-Xvfb', 'ncurses-devel', 'ncurses-compat-libs',
+                'readline-devel', 'mesa-libGL-devel'
+            ]
+        }
+    else:
+        # Debian/Ubuntu package names
+        return {
+            'build_essential': ['build-essential'],
+            'ssl_dev': ['libssl-dev'],
+            'curl_dev': ['libcurl4-openssl-dev'],
+            'python_dev': ['python3-dev'],
+            'system_libs': [
+                'git', 'curl', 'wget', 'sudo', 'unzip',
+                'libfreetype6-dev', 'libjpeg-dev', 'libpng-dev',
+                'libx11-dev', 'libxext-dev', 'libxrender-dev',
+                'libffi-dev', 'libsqlite3-dev', 'libbz2-dev',
+                'ffmpeg', 'python3-tk', 'liblzma-dev', 'ninja-build',
+                'libosmesa6-dev', 'libboost-all-dev', 'potrace',
+                'xvfb', 'libncurses5-dev', 'libncursesw5-dev',
+                'libreadline-dev', 'libgl1-mesa-dev'
+            ]
+        }
 
 
 def remove_chp():
@@ -106,9 +152,13 @@ def ensure_jupyterhub_package(prefix):
     hub environment be installed with pip prevents accidental mixing of python
     and conda packages!
     """
-    # Install dependencies for installing pycurl via pip, where build-essential
-    # is generally useful for installing other packages as well.
-    apt.install_packages(["libssl-dev", "libcurl4-openssl-dev", "build-essential"])
+    # Get system-specific package names
+    system_packages = get_system_packages()
+
+    # Install dependencies for installing pycurl via pip
+    apt.install_packages(
+        system_packages['ssl_dev'] + system_packages['curl_dev'] + system_packages['build_essential']
+    )
 
     conda.ensure_pip_requirements(
         prefix,
@@ -183,6 +233,12 @@ def ensure_user_environment(user_requirements_txt_file):
     # Check OS, set appropriate string for conda installer path
     if os.uname().sysname != "Linux":
         raise OSError("TLJH is only supported on Linux platforms.")
+
+    # Get system-specific package names
+    system_packages = get_system_packages()
+
+    # Install system dependencies
+    apt.install_packages(system_packages['system_libs'])
 
     # Check the existing environment for what to do
     package_versions = conda.get_conda_package_versions(USER_ENV_PREFIX)
@@ -282,7 +338,7 @@ def ensure_user_environment(user_requirements_txt_file):
     # version specification used for the hub env.
     #
     with open(os.path.join(HERE, "requirements-hub-env.txt")) as f:
-        jh_version_spec = [l for l in f if l.startswith("jupyterhub>=")][0]
+        jh_version_spec = [line for line in f if line.startswith("jupyterhub>=")][0]
     conda.ensure_pip_packages(USER_ENV_PREFIX, [jh_version_spec], upgrade=True)
 
     # Install user environment extras for initial installations

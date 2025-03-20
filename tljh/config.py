@@ -378,7 +378,8 @@ def main(argv=None):
 
     subparsers = argparser.add_subparsers(dest="action")
 
-    show_parser = subparsers.add_parser("show", help="Show current configuration")
+    # NOTE: show_parser is not used in the current implementation
+    # show_parser = subparsers.add_parser("show", help="Show current configuration")
 
     unset_parser = subparsers.add_parser("unset", help="Unset a configuration property")
     unset_parser.add_argument(
