@@ -335,6 +335,130 @@ def _resolve_git_version(version):
     return ".".join(str(f) for f in found)
 
 
+def install_packages_apt(apt_get_adjusted_env, distro):
+    """Helper function to install packages on Debian/Ubuntu systems"""
+    run_subprocess(["apt-get", "update"])
+    run_subprocess(
+        ["apt-get", "install", "--yes", "software-properties-common"],
+        env=apt_get_adjusted_env,
+    )
+    # Section "universe" exists and is required only in ubuntu.
+    if distro == "ubuntu":
+        run_subprocess(["add-apt-repository", "--yes", "universe"])
+        run_subprocess(["add-apt-repository", "--yes", "ppa:freecad-maintainers/freecad-stable"])
+    
+    run_subprocess(["apt-get", "update"])
+    run_subprocess(
+        [
+            "apt-get",
+            "install",
+            "--yes",
+            # Base requirements
+            "python3",
+            "python3-venv",
+            "python3-pip",
+            "git",
+            "sudo",
+            # Build tools
+            "build-essential",
+            "ca-certificates",
+            "ccache",
+            "cmake",
+            "curl",
+            "pkg-config",
+            "ssh",
+            "unzip",
+            "wget",
+            "ninja-build",
+            # Library dependencies
+            "libfreetype6-dev",
+            "libhdf5-serial-dev",
+            "libzmq3-dev",
+            "libjpeg-dev",
+            "libpng-dev",
+            "libsm6",
+            "libxext6",
+            "libxrender-dev",
+            "libffi-dev",
+            "libsqlite3-dev",
+            "libbz2-dev",
+            "liblzma-dev",
+            "libosmesa6-dev",
+            "libboost-all-dev",
+            "libncurses5-dev",
+            "libncursesw5-dev",
+            "libreadline-dev",
+            "libgl1-mesa-glx",
+            # Additional software
+            "ffmpeg",
+            "python3-tk",
+            "freecad",
+            "potrace",
+            "xvfb",
+            "cuda-toolkit-11-8",
+        ],
+        env=apt_get_adjusted_env,
+    )
+
+
+def install_packages_dnf():
+    """Helper function to install packages on RHEL-based systems"""
+    # Enable EPEL repository for additional packages
+    run_subprocess(["dnf", "install", "--assumeyes", "epel-release"])
+    run_subprocess(["dnf", "update", "--assumeyes"])
+
+    # Install development tools group
+    run_subprocess(["dnf", "groupinstall", "--assumeyes", "Development Tools"])
+
+    run_subprocess(
+        [
+            "dnf",
+            "install",
+            "--assumeyes",
+            # Base requirements
+            "python3",
+            "python3-pip",
+            "git",
+            "sudo",
+            # Build tools
+            "ca-certificates",
+            "ccache",
+            "cmake",
+            "curl",
+            "pkg-config",
+            "openssh",
+            "unzip",
+            "wget",
+            "ninja-build",
+            # Library dependencies
+            "freetype-devel",
+            "hdf5-devel",
+            "zeromq-devel",
+            "libjpeg-devel",
+            "libpng-devel",
+            "libSM",
+            "libXext",
+            "libXrender-devel",
+            "libffi-devel",
+            "sqlite-devel",
+            "bzip2-devel",
+            "xz-devel",
+            "mesa-libOSMesa-devel",
+            "boost-devel",
+            "ncurses-devel",
+            "readline-devel",
+            "mesa-libGL",
+            # Additional software
+            "ffmpeg",
+            "python3-tkinter",
+            "freecad",
+            "potrace",
+            "xorg-x11-server-Xvfb",
+            "cuda-toolkit",
+        ]
+    )
+
+
 def main():
     """
     This bootstrap script intercepts some command line flags, everything else is
@@ -436,89 +560,18 @@ def main():
     else:
         logger.info("Existing TLJH installation not detected, installing...")
         logger.info("Setting up hub environment...")
-        logger.info("Installing Python, venv, pip, and git via apt-get...")
+        logger.info("Installing required system packages...")
 
-        # In some very minimal base VM images, it looks like the "universe" apt
-        # package repository is disabled by default, causing bootstrapping to
-        # fail. We install the software-properties-common package so we can get
-        # the add-apt-repository command to make sure the universe repository is
-        # enabled, since that's where the python3-pip package lives.
-        #
-        # In Ubuntu 21.10 DEBIAN_FRONTEND has found to be needed to avoid
-        # getting stuck on an input prompt during apt-get install.
-        #
-        apt_get_adjusted_env = os.environ.copy()
-        apt_get_adjusted_env["DEBIAN_FRONTEND"] = "noninteractive"
-        run_subprocess(["apt-get", "update"])
-        run_subprocess(
-            ["apt-get", "install", "--yes", "software-properties-common"],
-            env=apt_get_adjusted_env,
-        )
-        # Section "universe" exists and is required only in ubuntu.
-        if distro == "ubuntu":
-            run_subprocess([
-                "add-apt-repository",
-                "--yes",
-                "universe",
-            ])
-            run_subprocess([
-                "add-apt-repository",
-                "--yes",
-                "ppa:freecad-maintainers/freecad-stable"
-            ])
-        run_subprocess(["apt-get", "update"])
-        run_subprocess(
-            [
-                "apt-get",
-                "install",
-                "--yes",
-                "python3",
-                "python3-venv",
-                "python3-pip",
-                "git",
-                "sudo",  # sudo is missing in default debian install
-                "build-essential",
-                "ca-certificates",
-                "ccache",
-                "cmake",
-                "curl",
-                "git",
-                "pkg-config",
-                "ssh",
-                "unzip",
-                "wget",
-                "libfreetype6-dev",
-                "libhdf5-serial-dev",
-                "libzmq3-dev",
-                "libjpeg-dev",
-                "libpng-dev",
-                "libsm6",
-                "libxext6",
-                "libxrender-dev",
-                "libffi-dev",
-                "libsqlite3-dev",
-                "libbz2-dev",
-                "ffmpeg",
-                "python3-tk",
-                "liblzma-dev",
-                "ninja-build",
-                "libosmesa6-dev",
-                "libboost-all-dev",
-                "freecad",
-                "potrace",
-                "xvfb",
-                "cuda-toolkit-11-8",
-                "libncurses5-dev",
-                "libncursesw5-dev",
-                "libreadline-dev",
-                "libgl1-mesa-glx",
-            ],
-            env=apt_get_adjusted_env,
-        )
+        if distro in ["ubuntu", "debian"]:
+            apt_get_adjusted_env = os.environ.copy()
+            apt_get_adjusted_env["DEBIAN_FRONTEND"] = "noninteractive"
+            install_packages_apt(apt_get_adjusted_env, distro)
+        else:  # RHEL-based systems
+            install_packages_dnf()
 
-        # Install AWS CLI
+        # Install AWS CLI (same for both systems)
         logger.info("Installing AWS CLI...")
-        run_subprocess(["rm", "-rf", "awscliv2.zip", "aws"])  # Clean up any existing files
+        run_subprocess(["rm", "-rf", "awscliv2.zip", "aws"])
         run_subprocess([
             "curl",
             "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip",
@@ -529,39 +582,53 @@ def main():
 
         # Install DVC
         logger.info("Installing DVC...")
-        run_subprocess([
-            "wget",
-            "https://dvc.org/deb/dvc.list",
-            "-O", "/etc/apt/sources.list.d/dvc.list"
-        ])
-        # Download and process the GPG key in separate steps
-        run_subprocess([
-            "wget",
-            "-qO",
-            "iterative.asc",
-            "https://dvc.org/deb/iterative.asc"
-        ])
-        # Remove existing GPG file if it exists
-        if os.path.exists("packages.iterative.gpg"):
-            os.remove("packages.iterative.gpg")
-        run_subprocess([
-            "gpg",
-            "--dearmor",
-            "-o",
-            "packages.iterative.gpg",
-            "iterative.asc"
-        ])
-        run_subprocess([
-            "install",
-            "-o", "root",
-            "-g", "root",
-            "-m", "644",
-            "packages.iterative.gpg",
-            "/etc/apt/trusted.gpg.d/packages.iterative.gpg"
-        ])
-        run_subprocess(["apt-get", "update"], env=apt_get_adjusted_env)
-        run_subprocess(["apt-get", "install", "dvc"], env=apt_get_adjusted_env)
-        
+        if distro in ["ubuntu", "debian"]:
+            # Debian/Ubuntu DVC installation
+            run_subprocess([
+                "wget",
+                "https://dvc.org/deb/dvc.list",
+                "-O", "/etc/apt/sources.list.d/dvc.list"
+            ])
+            run_subprocess([
+                "wget",
+                "-qO",
+                "iterative.asc",
+                "https://dvc.org/deb/iterative.asc"
+            ])
+            if os.path.exists("packages.iterative.gpg"):
+                os.remove("packages.iterative.gpg")
+            run_subprocess([
+                "gpg",
+                "--dearmor",
+                "-o",
+                "packages.iterative.gpg",
+                "iterative.asc"
+            ])
+            run_subprocess([
+                "install",
+                "-o", "root",
+                "-g", "root",
+                "-m", "644",
+                "packages.iterative.gpg",
+                "/etc/apt/trusted.gpg.d/packages.iterative.gpg"
+            ])
+            run_subprocess(["apt-get", "update"], env=apt_get_adjusted_env)
+            run_subprocess(["apt-get", "install", "dvc"], env=apt_get_adjusted_env)
+        else:
+            # RHEL-based DVC installation
+            run_subprocess([
+                "wget",
+                "https://dvc.org/rpm/dvc.repo",
+                "-O", "/etc/yum.repos.d/dvc.repo"
+            ])
+            run_subprocess([
+                "rpm",
+                "--import",
+                "https://dvc.org/rpm/iterative.asc"
+            ])
+            run_subprocess(["dnf", "update", "--assumeyes"])
+            run_subprocess(["dnf", "install", "--assumeyes", "dvc"])
+
         logger.info("Setting up virtual environment at {}".format(hub_env_prefix))
         os.makedirs(hub_env_prefix, exist_ok=True)
         run_subprocess(["python3", "-m", "venv", hub_env_prefix])
