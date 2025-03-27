@@ -300,7 +300,7 @@ def _resolve_git_version(version):
     - Otherwise assume version is a branch or hash and return it without checking
     """
 
-    if version != "latest" and not re.match(r"\d+(\.\d+)?(\.\d+)?$", version):
+    if version != "latest" and not re.match(r"\d+(\.\d+)?(\.\d+)?(-[\w-]+)?$", version):
         return version
 
     all_versions = set()
