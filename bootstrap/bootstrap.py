@@ -409,11 +409,31 @@ def install_packages_dnf():
     """Helper function to install packages on RHEL-based systems"""
     # Enable EPEL repository for additional packages
     run_subprocess(["dnf", "install", "--assumeyes", "epel-release"])
+    
+    # Enable RPM Fusion repositories (needed for ffmpeg)
+    run_subprocess([
+        "dnf", "install", "--assumeyes",
+        "https://download1.rpmfusion.org/free/el/rpmfusion-free-release-9.noarch.rpm",
+        "https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-9.noarch.rpm"
+    ])
+
+    # Add FreeCAD COPR repository
+    run_subprocess([
+        "dnf", "copr", "enable", "--assumeyes", "freecad/freecad-stable"
+    ])
+
+    # Add NVIDIA repository for CUDA
+    run_subprocess([
+        "dnf", "config-manager", "--add-repo",
+        "https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo"
+    ])
+
     run_subprocess(["dnf", "update", "--assumeyes"])
 
     # Install development tools group
     run_subprocess(["dnf", "groupinstall", "--assumeyes", "Development Tools"])
 
+    # Rest of the package installation
     run_subprocess(
         [
             "dnf",
@@ -458,7 +478,7 @@ def install_packages_dnf():
             "freecad",
             "potrace",
             "xorg-x11-server-Xvfb",
-            "cuda-toolkit",
+            "cuda-toolkit-11-8"  # Specific CUDA version
         ]
     )
 
