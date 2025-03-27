@@ -417,10 +417,17 @@ def install_packages_dnf():
         "https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-9.noarch.rpm"
     ])
 
-    # Add FreeCAD COPR repository
-    run_subprocess([
-        "dnf", "copr", "enable", "--assumeyes", "freecad/freecad-stable"
-    ])
+    # # Add FreeCAD COPR repository
+    # run_subprocess([
+    #     "dnf", "copr", "enable", "--assumeyes", "freecad/freecad-stable"
+    # ])
+
+    # Instead of dnf, use snap to install FreeCAD
+    # sudo dnf install epel-release
+    # sudo dnf install snapd
+    # sudo systemctl enable --now snapd.socket
+    # sudo ln -s /var/lib/snapd/snap /snap
+    # sudo snap install freecad
 
     # Add NVIDIA repository for CUDA
     run_subprocess([
@@ -475,7 +482,7 @@ def install_packages_dnf():
             # Additional software
             "ffmpeg",
             "python3-tkinter",
-            "freecad",
+            # "freecad", # TODO: Use snap to install FreeCAD
             "potrace",
             "xorg-x11-server-Xvfb",
             "cuda-toolkit-11-8"  # Specific CUDA version
