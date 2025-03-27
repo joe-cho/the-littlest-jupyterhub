@@ -12,3 +12,6 @@ username="$1"
 
 # Execute the bootstrap command with the provided username
 cat ./bootstrap.py | sudo -E python3 - --admin "$admin_username"
+
+# If you install without aslanx_ai and dhh_bpc_ai packages.
+# cat ./bootstrap.py | sudo -E python3 - --version 2.0.19-no-aslanx --admin
