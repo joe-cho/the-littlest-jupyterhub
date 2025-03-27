@@ -91,5 +91,5 @@ torch_spline_conv @ https://data.pyg.org/whl/torch-2.1.0%2Bcu118/torch_spline_co
 kaolin @ https://nvidia-kaolin.s3.us-east-2.amazonaws.com/torch-2.1.1_cu121/kaolin-0.15.0-cp310-cp310-linux_x86_64.whl; platform_system == "Linux"
 
 # Local wheel packages
-aslanx_ai @ file:///dhh_bpc/notebooks/.packages/aslanx_ai-0.1.0-cp310-cp310-linux_x86_64.whl
-dhh_bpc_ai @ file:///dhh_bpc/notebooks/.packages/dhh_bpc_ai-0.1.0-cp310-cp310-linux_x86_64.whl
+# aslanx_ai @ file:///dhh_bpc/notebooks/.packages/aslanx_ai-0.1.0-cp310-cp310-linux_x86_64.whl
+# dhh_bpc_ai @ file:///dhh_bpc/notebooks/.packages/dhh_bpc_ai-0.1.0-cp310-cp310-linux_x86_64.whl
