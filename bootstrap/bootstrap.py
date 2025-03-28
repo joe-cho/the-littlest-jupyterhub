@@ -210,17 +210,21 @@ def ensure_host_system_can_install_tljh():
     Check if TLJH is installable in current host system and exit with a clear
     error message otherwise.
     """
-    # Require Ubuntu 22.04+ or Debian 11+
+    # Require Ubuntu 22.04+, Debian 11+, or Rocky Linux 8+
     distro = get_os_release_variable("ID")
     version = get_os_release_variable("VERSION_ID")
-    if distro not in ["ubuntu", "debian"]:
-        print("The Littlest JupyterHub currently supports Ubuntu or Debian Linux only")
+    
+    if distro not in ["ubuntu", "debian", "rocky"]:
+        print("The Littlest JupyterHub currently supports Ubuntu, Debian, or Rocky Linux only")
         sys.exit(1)
     elif distro == "ubuntu" and _parse_version(version) < (22, 4):
         print("The Littlest JupyterHub requires Ubuntu 22.04 or higher")
         sys.exit(1)
     elif distro == "debian" and _parse_version(version) < (11,):
         print("The Littlest JupyterHub requires Debian 11 or higher")
+        sys.exit(1)
+    elif distro == "rocky" and _parse_version(version) < (8,):
+        print("The Littlest JupyterHub requires Rocky Linux 8 or higher")
         sys.exit(1)
 
     # Require Python 3.9+
@@ -296,7 +300,7 @@ def _resolve_git_version(version):
     - Otherwise assume version is a branch or hash and return it without checking
     """
 
-    if version != "latest" and not re.match(r"\d+(\.\d+)?(\.\d+)?$", version):
+    if version != "latest" and not re.match(r"\d+(\.\d+)?(\.\d+)?(-[\w-]+)?$", version):
         return version
 
     all_versions = set()
@@ -405,11 +409,38 @@ def install_packages_dnf():
     """Helper function to install packages on RHEL-based systems"""
     # Enable EPEL repository for additional packages
     run_subprocess(["dnf", "install", "--assumeyes", "epel-release"])
+    
+    # Enable RPM Fusion repositories (needed for ffmpeg)
+    run_subprocess([
+        "dnf", "install", "--assumeyes",
+        "https://download1.rpmfusion.org/free/el/rpmfusion-free-release-9.noarch.rpm",
+        "https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-9.noarch.rpm"
+    ])
+
+    # # Add FreeCAD COPR repository
+    # run_subprocess([
+    #     "dnf", "copr", "enable", "--assumeyes", "freecad/freecad-stable"
+    # ])
+
+    # Instead of dnf, use snap to install FreeCAD
+    # sudo dnf install epel-release
+    # sudo dnf install snapd
+    # sudo systemctl enable --now snapd.socket
+    # sudo ln -s /var/lib/snapd/snap /snap
+    # sudo snap install freecad
+
+    # Add NVIDIA repository for CUDA
+    run_subprocess([
+        "dnf", "config-manager", "--add-repo",
+        "https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo"
+    ])
+
     run_subprocess(["dnf", "update", "--assumeyes"])
 
     # Install development tools group
     run_subprocess(["dnf", "groupinstall", "--assumeyes", "Development Tools"])
 
+    # Rest of the package installation
     run_subprocess(
         [
             "dnf",
@@ -451,10 +482,10 @@ def install_packages_dnf():
             # Additional software
             "ffmpeg",
             "python3-tkinter",
-            "freecad",
+            # "freecad", # TODO: Use snap to install FreeCAD
             "potrace",
             "xorg-x11-server-Xvfb",
-            "cuda-toolkit",
+            "cuda-toolkit-11-8"  # Specific CUDA version
         ]
     )
 
