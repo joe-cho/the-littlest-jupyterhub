@@ -52,6 +52,9 @@ def setup_dhh_bpc_user(system_username):
                     shutil.copy2(src_file, dst_file)
                     shutil.chown(dst_file, system_username, system_username)
                     print(f"Successfully copied {file}")
+                    # Change permissions to 744
+                    os.chmod(dst_file, 0o744)
+                    print(f"Successfully changed permissions for {file}")
                 except Exception as e:
                     print(f"Error copying {file}: {str(e)}")
             
