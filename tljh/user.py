@@ -46,11 +46,14 @@ def setup_dhh_bpc_user(system_username):
         notebook_src = '/dhh_bpc/origin_notebooks'
         if os.path.exists(notebook_src):
             for file in os.listdir(notebook_src):
-                src_file = os.path.join(notebook_src, file)
-                dst_file = os.path.join(user_home, file)
-                shutil.copy2(src_file, dst_file)
-                # Change ownership of copied file to the system user
-                shutil.chown(dst_file, system_username, system_username)
+                try:
+                    src_file = os.path.join(notebook_src, file)
+                    dst_file = os.path.join(user_home, file)
+                    shutil.copy2(src_file, dst_file)
+                    shutil.chown(dst_file, system_username, system_username)
+                    print(f"Successfully copied {file}")
+                except Exception as e:
+                    print(f"Error copying {file}: {str(e)}")
             
         # Create flag file to prevent reruns
         open(first_run_flag, "w").close()
