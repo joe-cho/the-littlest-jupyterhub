@@ -39,7 +39,7 @@ pymeshfix>=0.16.3,<0.17.0
 trimesh>=4.4.0,<5.0.0
 addict>=2.4.0,<3.0.0
 scikit-image>=0.23.2,<0.24.0
-rtree>=1.2.0,<2.0.0
+rtree>=1.4.0,<2.0.0
 graphviz>=0.20.3,<0.21.0
 randomname>=0.2.1,<0.3.0
 diffusers>=0.29.1,<0.30.0
@@ -64,6 +64,19 @@ occ>=0.0.2.dev20190912195130
 bokeh>=3.6.2,<4.0.0
 numpy==1.26.2
 meshio>=5.3.5,<6.0.0
+
+# pyvista is already present with version 0.44.2
+# ipywidgets is already present with version 8.1.5
+# rtree is already present (will update version)
+# fast-simplification is already present with version 0.1.7
+
+scikit-learn>=1.6.1,<2.0.0
+cascadio>=0.0.16,<0.1.0
+cadquery==2.2.0
+nlopt==2.7.1
+opencv-python>=4.0.0,<5.0.0
+ipyfilechooser>=0.6.0,<0.7.0
+rtree>=1.4.0,<2.0.0  # Updated version
 
 # PyTorch and related packages with platform-specific wheels
 torch @ https://download.pytorch.org/whl/cpu/torch-2.1.1-cp310-none-macosx_11_0_arm64.whl; platform_system == "Darwin"
