@@ -13,8 +13,8 @@ The script includes:
   - Copy notebooks from a central location to user's home directory
   - Create a flag file to prevent re-running the setup
 
-The shared resources are expected to be in /dhh_bpc/dhh_bpc_ai/
-Notebooks are copied from /dhh_bpc/notebooks/
+The shared resources are expected to be in /dhh_bpc/
+Notebooks are copied from /dhh_bpc/origin_notebooks/
 
 This configuration is applied through JupyterHub's pre-spawn hook mechanism.
 """
@@ -30,10 +30,12 @@ def first_time_setup(spawner):
     if not os.path.exists(first_run_flag):
         # Create symbolic links
         links = {
-            'config': '/dhh_bpc/dhh_bpc_ai/config',
-            'widgets': '/dhh_bpc/dhh_bpc_ai/widgets',
-            'datasets': '/dhh_bpc/dhh_bpc_ai/datasets',
-            'weights': '/dhh_bpc/dhh_bpc_ai/weights'
+            'configs': '/dhh_bpc/configs',
+            'datasets': '/dhh_bpc/datasets',
+            'weights': '/dhh_bpc/weights',
+            'widget_code': '/dhh_bpc/widget_code',
+            'widgets': '/dhh_bpc/widgets',
+            'origin_notebooks': '/dhh_bpc/origin_notebooks',
         }
         
         for link_name, target in links.items():
@@ -41,7 +43,7 @@ def first_time_setup(spawner):
             os.symlink(target, link_path)
         
         # Copy notebooks
-        notebook_src = '/dhh_bpc/notebooks'
+        notebook_src = '/dhh_bpc/origin_notebooks'
         for file in os.listdir(notebook_src):
             src_file = os.path.join(notebook_src, file)
             dst_file = os.path.join(user_home, file)

@@ -14,7 +14,7 @@ import shutil
 # Set up plugin infrastructure
 from tljh.utils import get_plugin_manager
 
-def setup_dhh_bpc_ai_user(system_username):
+def setup_dhh_bpc_user(system_username):
     """
     Setup DHH BPC AI user environment by creating symbolic links to shared resources
     and copying notebooks to the user's home directory.
@@ -29,10 +29,12 @@ def setup_dhh_bpc_ai_user(system_username):
     if not os.path.exists(first_run_flag):
         # Create symbolic links
         links = {
-            'config': '/dhh_bpc/dhh_bpc_ai/config',
-            'widgets': '/dhh_bpc/dhh_bpc_ai/widgets',
-            'datasets': '/dhh_bpc/dhh_bpc_ai/datasets',
-            'weights': '/dhh_bpc/dhh_bpc_ai/weights'
+            'configs': '/dhh_bpc/configs',
+            'datasets': '/dhh_bpc/datasets',
+            'weights': '/dhh_bpc/weights',
+            'widget_code': '/dhh_bpc/widget_code',
+            'widgets': '/dhh_bpc/widgets',
+            'origin_notebooks': '/dhh_bpc/origin_notebooks',
         }
         
         for link_name, target in links.items():
@@ -41,7 +43,7 @@ def setup_dhh_bpc_ai_user(system_username):
                 os.symlink(target, link_path)
         
         # Copy notebooks
-        notebook_src = '/dhh_bpc/notebooks'
+        notebook_src = '/dhh_bpc/origin_notebooks'
         if os.path.exists(notebook_src):
             for file in os.listdir(notebook_src):
                 src_file = os.path.join(notebook_src, file)
