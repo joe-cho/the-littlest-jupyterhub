@@ -32,16 +32,33 @@ def setup_dhh_bpc_user(system_username):
             'configs': '/dhh_bpc/configs',
             'datasets': '/dhh_bpc/datasets',
             'weights': '/dhh_bpc/weights',
-            'widget_code': '/dhh_bpc/widget_code',
             'widgets': '/dhh_bpc/widgets',
             'origin_notebooks': '/dhh_bpc/origin_notebooks',
         }
-        
+
         for link_name, target in links.items():
             link_path = os.path.join(user_home, link_name)
             if not os.path.exists(link_path):
                 os.symlink(target, link_path)
-        
+
+        # Copy widget_code directory
+        widget_code_src = '/dhh_bpc/widget_code'
+        widget_code_dst = os.path.join(user_home, 'widget_code')
+        if os.path.exists(widget_code_src):
+            try:
+                shutil.copytree(widget_code_src, widget_code_dst)
+                # Change ownership of the directory and its contents
+                for root, dirs, files in os.walk(widget_code_dst):
+                    shutil.chown(root, system_username, system_username)
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        shutil.chown(file_path, system_username, system_username)
+                        # Set permissions to 744 (rwxr--r--)
+                        shutil.chmod(file_path, 0o744)
+                print("Successfully copied widget_code directory")
+            except Exception as e:
+                print(f"Error copying widget_code directory: {str(e)}")
+
         # Copy notebooks
         notebook_src = '/dhh_bpc/origin_notebooks'
         if os.path.exists(notebook_src):
