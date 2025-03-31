@@ -48,14 +48,10 @@ def setup_dhh_bpc_user(system_username):
         if os.path.exists(widget_code_src):
             try:
                 shutil.copytree(widget_code_src, widget_code_dst)
-                # Change ownership of the directory and its contents
-                for root, dirs, files in os.walk(widget_code_dst):
-                    shutil.chown(root, system_username, system_username)
-                    for file in files:
-                        file_path = os.path.join(root, file)
-                        shutil.chown(file_path, system_username, system_username)
-                        # Set permissions to 744 (rwxr--r--)
-                        shutil.chmod(file_path, 0o744)
+                # Change ownership using shell command
+                subprocess.check_call(['chown', '-R', f'{system_username}:{system_username}', widget_code_dst])
+                # Set permissions to 744 for all files
+                subprocess.check_call(['chmod', '-R', '744', widget_code_dst])
                 print("Successfully copied widget_code directory")
             except Exception as e:
                 print(f"Error copying widget_code directory: {str(e)}")
@@ -68,11 +64,10 @@ def setup_dhh_bpc_user(system_username):
                     src_file = os.path.join(notebook_src, file)
                     dst_file = os.path.join(user_home, file)
                     shutil.copy2(src_file, dst_file)
-                    shutil.chown(dst_file, system_username, system_username)
+                    # Change ownership and permissions using shell commands
+                    subprocess.check_call(['chown', f'{system_username}:{system_username}', dst_file])
+                    subprocess.check_call(['chmod', '744', dst_file])
                     print(f"Successfully copied {file}")
-                    # Change permissions to 744 (rwxr--r--)
-                    shutil.chmod(dst_file, 0o744)
-                    print(f"Successfully changed permissions for {file}")
                 except Exception as e:
                     print(f"Error copying {file}: {str(e)}")
             
