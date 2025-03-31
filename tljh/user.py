@@ -41,39 +41,40 @@ def setup_dhh_bpc_user(system_username):
             if not os.path.exists(link_path):
                 os.symlink(target, link_path)
 
-        # Copy widget_code directory
-        widget_code_src = '/dhh_bpc/widget_code'
-        widget_code_dst = os.path.join(user_home, 'widget_code')
-        if os.path.exists(widget_code_src):
-            try:
-                shutil.copytree(widget_code_src, widget_code_dst)
-                # Change ownership of the directory and its contents
-                for root, dirs, files in os.walk(widget_code_dst):
-                    shutil.chown(root, system_username, system_username)
-                    for file in files:
-                        file_path = os.path.join(root, file)
-                        shutil.chown(file_path, system_username, system_username)
-                        # Set permissions to 744 (rwxr--r--)
-                        shutil.chmod(file_path, 0o744)
-                print("Successfully copied widget_code directory")
-            except Exception as e:
-                print(f"Error copying widget_code directory: {str(e)}")
+        # TODO: re-use later. A user had better copy them by himself.
+        # # Copy widget_code directory
+        # widget_code_src = '/dhh_bpc/widget_code'
+        # widget_code_dst = os.path.join(user_home, 'widget_code')
+        # if os.path.exists(widget_code_src):
+        #     try:
+        #         shutil.copytree(widget_code_src, widget_code_dst)
+        #         # Change ownership of the directory and its contents
+        #         for root, dirs, files in os.walk(widget_code_dst):
+        #             shutil.chown(root, system_username, system_username)
+        #             for file in files:
+        #                 file_path = os.path.join(root, file)
+        #                 shutil.chown(file_path, system_username, system_username)
+        #                 # Set permissions to 744 (rwxr--r--)
+        #                 shutil.chmod(file_path, 0o744)
+        #         print("Successfully copied widget_code directory")
+        #     except Exception as e:
+        #         print(f"Error copying widget_code directory: {str(e)}")
 
-        # Copy notebooks
-        notebook_src = '/dhh_bpc/origin_notebooks'
-        if os.path.exists(notebook_src):
-            for file in os.listdir(notebook_src):
-                try:
-                    src_file = os.path.join(notebook_src, file)
-                    dst_file = os.path.join(user_home, file)
-                    shutil.copy2(src_file, dst_file)
-                    shutil.chown(dst_file, system_username, system_username)
-                    print(f"Successfully copied {file}")
-                    # Change permissions to 744 (rwxr--r--)
-                    shutil.chmod(dst_file, 0o744)
-                    print(f"Successfully changed permissions for {file}")
-                except Exception as e:
-                    print(f"Error copying {file}: {str(e)}")
+        # # Copy notebooks
+        # notebook_src = '/dhh_bpc/origin_notebooks'
+        # if os.path.exists(notebook_src):
+        #     for file in os.listdir(notebook_src):
+        #         try:
+        #             src_file = os.path.join(notebook_src, file)
+        #             dst_file = os.path.join(user_home, file)
+        #             shutil.copy2(src_file, dst_file)
+        #             shutil.chown(dst_file, system_username, system_username)
+        #             print(f"Successfully copied {file}")
+        #             # Change permissions to 744 (rwxr--r--)
+        #             shutil.chmod(dst_file, 0o744)
+        #             print(f"Successfully changed permissions for {file}")
+        #         except Exception as e:
+        #             print(f"Error copying {file}: {str(e)}")
             
         # Create flag file to prevent reruns
         open(first_run_flag, "w").close()
